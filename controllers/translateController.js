@@ -13,7 +13,7 @@ export async function translateController(req, res) {
     const result = await translateMultipleLangsOneRequest(text, targetLangs, ip);
     res.json(result);
   } catch (err) {
-    // logger.error("Translation failed", err);
+    logger.error("Translation failed", err);
     res.status(500).json({ error: "Multi-translation failed", details: err.message });
   }
 }

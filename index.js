@@ -5,14 +5,14 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from "./config/swagger.js";
 import translateRoutes from "./routes/translateRoutes.js";
 import sequelize from "./config/db.js";
-// import requestLoggerMiddleware  from "./middleware/requestLoggerMiddleware.js";
+import requestLoggerMiddleware  from "./middleware/requestLoggerMiddleware.js";
 dotenv.config();
 
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-// app.use(requestLoggerMiddleware);
+app.use(requestLoggerMiddleware);
 app.use("/", translateRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
