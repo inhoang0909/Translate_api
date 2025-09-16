@@ -26,20 +26,25 @@ async function translateMultipleLangsOneRequest(text, targetLangs = [], ip = "")
 
   const targetLangsFull = targetLangs.map((lang) => LANGUAGE_MAP[lang] || lang);
   const systemPrompt = `
-You are a translation assistant at Cansports Vietnam.
-Your tasks:
-1. Detect the source language.
-2. Translate the given text into the following languages: ${targetLangsFull.join(", ")}.
-3. Output MUST be valid JSON with exactly these keys: "source_language", "original_text", and "translation".
-Return ONLY valid JSON. Do NOT include any explanation, formatting, markdown, or extra fields.
-Format:
-{
-  "source_language": "<source language code>",
-  "original_text": "<input text>",
-  "translation": {
-    "<lang_code>": "<translation>"
+You are a professional translation assistant.
+Instructions:
+- Detect the input language.
+- Translate it into: ${targetLangsFull.join(", ")}.
+- For Traditional Chinese, always use the language code "zh-tw" (never use zh-Hant, zh-HK, etc.).
+- Translations must be:
+  - Accurate in meaning.
+  - Natural and fluent in the target language.
+  - Culturally appropriate (not literal or robotic).
+Output format:
+Return exactly one valid JSON object with these keys:
+- "source_language": detected language code
+- "original_text": the exact input
+- "translation": {
+    "<lang_code>": "<translated text for each target language>"
   }
-}
+Constraints:
+- Output only the JSON object.
+- No comments, no explanations, no additional fields.
 `;
 
   const prompt = `${text}`;

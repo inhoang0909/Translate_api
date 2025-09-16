@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const OLLAMA_API_URL = process.env.OLLAMA_API_URL;
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL;
+const OLLAMA_API_URL = process.env.OLLAMA_API_URL || "http://10.13.34.181:11434/api/generate"; ;
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3:8b";
 
 export async function translateWithQwen(prompt, systemPrompt) {
   try {
@@ -10,6 +10,10 @@ export async function translateWithQwen(prompt, systemPrompt) {
       prompt: prompt,
       stream: false,
       system: systemPrompt,
+      repeat_penalty: 1.5,
+      presence_penalty: 2.0,
+      top_p: 0.7,
+      repeat_last_n: 128,
       format: "json"
     };
     console.log("[QwenService] Payload to Ollama:", JSON.stringify(payload, null, 2));

@@ -1,4 +1,3 @@
-import logger from "../services/loggerService.js";
 import translateMultipleLangsOneRequest from "../services/translateService.js";
 
 export async function translateController(req, res) {
