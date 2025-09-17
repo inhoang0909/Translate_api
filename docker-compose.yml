@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  translate-api:
+    build: .
+    container_name: translate-api
+    command: ["node", "index.js"]
+    ports:
+      - "3000:3000"   # host:container
+    environment:
+      NODE_ENV: production
+      # DB config (sẽ đọc từ .env)
+      DB_HOST: mysql-db  
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      DB_DIALECT: ${DB_DIALECT}
+      # Logger config
+      LOGGER_URL: ${LOGGER_URL}
+      # Ollama config
+      OLLAMA_API_URL: ${OLLAMA_API_URL}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+    depends_on:
+      - mysql-db
+    restart: always
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    ports:
+      - "3307:3306" 
+
+volumes:
+  mysql_data:
