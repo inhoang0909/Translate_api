@@ -1,4 +1,4 @@
-import axios from "axios";
+import { queueOrExecuteRequest } from "./apiManager.js";
 import {
   QwenTimeoutError,
   QwenResponseError,
@@ -8,13 +8,6 @@ import {
   handleSpamRequest,
   cleanupRequest,
 } from "./spamHandler.js";
-
-import {
-  getAvailableApiIndex,
-  markApiBusy,
-  markApiFree,
-  getApiUrl,
-} from "./apiManager.js";
 
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3:8b";
 const TIMEOUT_MS = 5000;
@@ -26,7 +19,7 @@ export async function translateWithQwen(prompt, systemPrompt, clientId = "defaul
 
   handleSpamRequest(clientId, controller, SPAM_THRESHOLD_MS);
 
-  const payload = {
+  const body = {
     model: OLLAMA_MODEL,
     prompt,
     system: systemPrompt,
@@ -39,24 +32,19 @@ export async function translateWithQwen(prompt, systemPrompt, clientId = "defaul
     repeat_last_n: 128,
   };
 
-  const apiIndex = getAvailableApiIndex();
-  if (apiIndex === -1) {
-    clearTimeout(timeout);
-    cleanupRequest(clientId, controller);
-    throw new Error("All Ollama APIs are busy, please try again later.");
-  }
-
-  markApiBusy(apiIndex, clientId, OLLAMA_MODEL);
+  const payload = {
+    body,
+    model: OLLAMA_MODEL,
+    clientId,
+    signal: controller.signal,
+  };
 
   try {
-    const response = await axios.post(getApiUrl(apiIndex), payload, {
-      signal: controller.signal,
-    });
+    const result = await queueOrExecuteRequest(payload);
 
     clearTimeout(timeout);
     cleanupRequest(clientId, controller);
 
-    const result = response.data?.response?.trim();
     if (!result) {
       throw new QwenResponseError("Empty or invalid model response", 500);
     }
@@ -73,6 +61,7 @@ export async function translateWithQwen(prompt, systemPrompt, clientId = "defaul
     }
 
     return result;
+
   } catch (err) {
     clearTimeout(timeout);
     cleanupRequest(clientId, controller);
@@ -84,7 +73,5 @@ export async function translateWithQwen(prompt, systemPrompt, clientId = "defaul
 
     console.error(`[QwenService] Request failed for ${clientId}:`, err.message);
     throw err;
-  } finally {
-    markApiFree(apiIndex);
   }
 }
