@@ -6,7 +6,7 @@ services:
     container_name: translate-api
     command: ["node", "index.js"]
     ports:
-      - "3000:3000"   # host:container
+      - "49200:3000"   
     environment:
       NODE_ENV: production
       # DB config (sẽ đọc từ .env)

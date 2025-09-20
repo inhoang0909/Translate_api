@@ -10,47 +10,38 @@ const LANGUAGE_MAP = {
 
 function parseQwenResponse(raw) {
   try {
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON found in Qwen response");
-    return JSON.parse(jsonMatch[0]);
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("No JSON found in Qwen response");
+    return JSON.parse(match[0]);
   } catch (e) {
-    console.error("Failed to parse response:", raw);
+    console.error(" Failed to parse Qwen response:", raw);
     throw e;
   }
 }
 
-async function translateMultipleLangsOneRequest(text, targetLangs = [], ip = "") {
+function getClientIdFromIp(ip = "") {
+  return ip.replace(/^::ffff:/, "") || "unknown";
+}
+
+export default async function translateMultipleLangsOneRequest(text, targetLangs = [], ip = "") {
   if (!targetLangs || targetLangs.length === 0) {
     targetLangs = ["vi", "en", "zh-tw"];
   }
 
+  const clientId = getClientIdFromIp(ip);
   const targetLangsFull = targetLangs.map((lang) => LANGUAGE_MAP[lang] || lang);
+
   const systemPrompt = `
-You are a professional translation assistant.
-Instructions:
-- Detect the input language.
-- Translate it into: ${targetLangsFull.join(", ")}.
-- For Traditional Chinese, always use the language code "zh-tw" (never use zh-Hant, zh-HK, etc.).
-- Translations must be:
-  - Accurate in meaning.
-  - Natural and fluent in the target language.
-  - Culturally appropriate (not literal or robotic).
-Output format:
-Return exactly one valid JSON object with these keys:
-- "source_language": detected language code
-- "original_text": the exact input
-- "translation": {
-    "<lang_code>": "<translated text for each target language>"
-  }
-Constraints:
-- Output only the JSON object.
-- No comments, no explanations, no additional fields.
+Translate the input.
+- Detect source language.
+- Translate into: ${targetLangsFull.join(", ")}.
+- Use "zh-tw" for Traditional Chinese.
+- Output only JSON: {source_language, original_text, translation:{<lang_code>: <text>}}
+- Translations must be accurate, natural, fluent.
 `;
 
-  const prompt = `${text}`;
-
   try {
-    const raw = await translateWithQwen(prompt, systemPrompt);
+    const raw = await translateWithQwen(text, systemPrompt, clientId);
     const result = parseQwenResponse(raw);
 
     await Translation.create({
@@ -64,35 +55,32 @@ Constraints:
     logger.log("Saved translation", {
       original: text,
       detected: result.source_language,
-      targetLangs: targetLangs,
-      translation: result.translation,
+      targetLang: targetLangs.join(","),
+      translatedText: JSON.stringify(result.translation),
       ip
     });
 
     return result;
   } catch (err) {
-    console.error("Multi-translation failed:", err.message);
-    logger.error("Multi-translation failed", err);
+    console.error("Translation failed:", err.message);
 
-    const errorResult = {
+    const fallback = {
       source_language: "",
       original_text: text,
       translation: targetLangs.reduce((acc, lang) => {
         acc[lang] = null;
         return acc;
-      }, {}),
+      }, {})
     };
 
     await Translation.create({
       original: text,
-      detected: errorResult.source_language,
+      detected: fallback.source_language,
       targetLang: targetLangs.join(","),
-      translatedText: JSON.stringify(errorResult.translation),
+      translatedText: JSON.stringify(fallback.translation),
       ip
     });
 
-    return errorResult;
+    return fallback;
   }
 }
-
-export default translateMultipleLangsOneRequest;
