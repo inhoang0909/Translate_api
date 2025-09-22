@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const requestQueue = [];
-const MAX_QUEUE_LENGTH = 8;
+const MAX_QUEUE_LENGTH = 18;
 
 const OLLAMA_API_URLS = [
   process.env.OLLAMA_API_URL_1 || "http://10.13.34.181:11434/api/generate",
@@ -36,7 +36,7 @@ export function markApiFree(index) {
     console.log(`[apiManager] 🟢 API ${index} freed by ${clientId} after ${duration}ms`);
   }
   apiBusyStatus[index] = null;
-  processQueue(); // Xử lý tiếp queue sau khi API được free
+  processQueue(); 
 }
 
 export function getApiUrl(index) {
@@ -55,7 +55,6 @@ export function logApiStatus() {
   });
 }
 
-// Xử lý hàng đợi
 function processQueue() {
   const apiIndex = getAvailableApiIndex();
   if (apiIndex === -1 || requestQueue.length === 0) return;
@@ -82,7 +81,6 @@ export function queueOrExecuteRequest(payload) {
     const apiIndex = getAvailableApiIndex();
 
     if (apiIndex !== -1) {
-      // Xử lý ngay nếu có API rảnh
       markApiBusy(apiIndex, payload.clientId, payload.model);
 
       axios.post(getApiUrl(apiIndex), payload.body, {
@@ -98,7 +96,6 @@ export function queueOrExecuteRequest(payload) {
         });
 
     } else {
-      // Thêm vào queue nếu API đang bận
       if (requestQueue.length >= MAX_QUEUE_LENGTH) {
         return reject(new Error("All APIs busy and queue is full."));
       }

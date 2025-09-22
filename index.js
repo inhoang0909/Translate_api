@@ -16,7 +16,7 @@ app.use(requestLoggerMiddleware);
 app.use("/", translateRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-const PORT = 3000;
+const PORT = 5600;
 (async () => {
   try {
     await sequelize.authenticate();

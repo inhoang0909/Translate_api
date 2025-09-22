@@ -10,8 +10,8 @@ import {
 } from "./spamHandler.js";
 
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3:8b";
-const TIMEOUT_MS = 5000;
-const SPAM_THRESHOLD_MS = 4000;
+const TIMEOUT_MS = 30000;
+const SPAM_THRESHOLD_MS = 28000;
 
 export async function translateWithQwen(prompt, systemPrompt, clientId = "default") {
   const controller = new AbortController();
@@ -38,8 +38,10 @@ export async function translateWithQwen(prompt, systemPrompt, clientId = "defaul
     clientId,
     signal: controller.signal,
   };
+      console.log("[QwenService] Sending payload to API:", JSON.stringify(payload, null, 2));
 
   try {
+
     const result = await queueOrExecuteRequest(payload);
 
     clearTimeout(timeout);
