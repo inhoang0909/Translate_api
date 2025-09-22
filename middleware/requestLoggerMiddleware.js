@@ -18,7 +18,7 @@ export default function requestLoggerMiddleware(req, res, next) {
           time: new Date(),
         };
 
-        // await logger.send(logData);
+        await logger.send(logData);
       }
     } catch (error) {
       console.error("Logging error:", error);
