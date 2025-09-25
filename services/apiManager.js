@@ -5,15 +5,20 @@ const MAX_QUEUE_LENGTH = 18;
 
 const OLLAMA_API_URLS = [
   process.env.OLLAMA_API_URL_1 || "http://10.13.34.181:11434/api/generate",
-  process.env.OLLAMA_API_URL_2 || "http://10.13.34.181:11435/api/generate"
+  process.env.OLLAMA_API_URL_2 || "http://10.13.34.181:11435/api/generate",
+  process.env.OLLAMA_API_URL_3 || "http://10.13.32.51:11434/api/generate"
 ];
 
 const apiBusyStatus = OLLAMA_API_URLS.map(() => null);
 
+let lastUsedIndex = -1;
+
 export function getAvailableApiIndex() {
   for (let i = 0; i < apiBusyStatus.length; i++) {
-    if (!apiBusyStatus[i]) {
-      return i;
+    const nextIndex = (lastUsedIndex + 1 + i) % apiBusyStatus.length;
+    if (!apiBusyStatus[nextIndex]) {
+      lastUsedIndex = nextIndex;
+      return nextIndex;
     }
   }
   return -1;

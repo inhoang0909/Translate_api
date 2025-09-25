@@ -11,10 +11,12 @@ function withTimeout(promise, timeoutMs = 30000) {
 }
 
 export async function translateController(req, res) {
-  const { text, targetLangs } = req.body;
+  const { text, targetLangs, model } = req.body;
   const rawIp =
     req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const ip = rawIp.replace(/^::ffff:/, "");
+
+  const allowedModels = ["qwen3-8b", "qwen2.5-14b", "qwen3-30b"];
 
   if (!text) {
     return res.status(400).json({ error: "Missing 'text'." });
@@ -26,11 +28,24 @@ export async function translateController(req, res) {
       .json({ error: "Missing or invalid 'targetLangs' array." });
   }
 
+  if (model && !allowedModels.includes(model)) {
+    return res.status(400).json({
+      error: `Invalid model '${model}'. Allowed models are: ${allowedModels.join(", ")}`
+    });
+  }
+
+  const selectedModel = model || "qwen3-8b";
+
   try {
-    logger.log("Incoming translation request", { text, targetLangs, ip });
+    logger.log("Incoming translation request", {
+      text,
+      targetLangs,
+      ip,
+      model: selectedModel
+    });
 
     const result = await withTimeout(
-      translateMultipleLangsOneRequest(text, targetLangs, ip),
+      translateMultipleLangsOneRequest(text, targetLangs, ip, selectedModel),
       60000
     );
 

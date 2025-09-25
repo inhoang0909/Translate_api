@@ -36,6 +36,11 @@ const router = express.Router();
  *                 items:
  *                   type: string
  *                 example: [ "vi", "zh-tw" ]
+ *               model:
+ *                 type: string
+ *                 description: Optional model name (default is 'qwen3-8b').
+ *                 enum: [qwen3-8b, qwen2.5-14b, qwen3-30b]
+ *                 example: qwen3-8b
  *     responses:
  *       200:
  *         description: Successful translation
@@ -55,13 +60,18 @@ const router = express.Router();
  *                   additionalProperties:
  *                     type: string
  *                   example:
- *                     vi: "Xin chào, bạn khỏe không?"
- *                     zh-tw: "你好，你好嗎？"
+ *                     vi: "Xin chào, bạn đang khỏe không?"
+ *                     zh-tw: "你好，你怎麼樣？"
+ *                 model:
+ *                   type: string
+ *                   example: qwen3-8b
  *       400:
  *         description: Bad request (e.g., missing parameters)
  *       500:
  *         description: Internal server error
  */
+
+
 router.post("/translate", translateController);
 
 export default router;

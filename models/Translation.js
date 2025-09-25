@@ -21,6 +21,11 @@ const Translation = sequelize.define("Translation", {
   ip: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  model: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "qwen3-8b"
   }
 });
 
