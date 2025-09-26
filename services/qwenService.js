@@ -13,7 +13,12 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen3:8b";
 const TIMEOUT_MS = 30000;
 const SPAM_THRESHOLD_MS = 28000;
 
-export async function translateWithQwen(prompt, systemPrompt, clientId = "default") {
+export async function translateWithQwen(
+  prompt,
+  systemPrompt,
+  clientId = "default",
+  model = OLLAMA_MODEL
+) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -38,7 +43,7 @@ export async function translateWithQwen(prompt, systemPrompt, clientId = "defaul
     clientId,
     signal: controller.signal,
   };
-      console.log("[QwenService] Sending payload to API:", JSON.stringify(payload, null, 2));
+  console.log("[QwenService] Sending payload to API:", JSON.stringify(payload, null, 2));
 
   try {
 

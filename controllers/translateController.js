@@ -16,7 +16,7 @@ export async function translateController(req, res) {
     req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const ip = rawIp.replace(/^::ffff:/, "");
 
-  const allowedModels = ["qwen3-8b", "qwen2.5-14b", "qwen3-30b"];
+  const allowedModels = ["qwen3-8b", "gemma3-12b", "qwen3-32b"];
 
   if (!text) {
     return res.status(400).json({ error: "Missing 'text'." });

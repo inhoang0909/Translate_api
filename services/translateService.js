@@ -1,42 +1,41 @@
+import { translateWithQwen } from "./qwenService.js";
 import Translation from "../models/Translation.js";
 import logger from "./loggerService.js";
+import buildSystemPrompt from "../helpers/buildPrompt.js";
+import parseQwenResponse from "../helpers/parseResponse.js";
 import buildFallback from "../helpers/buildFallback.js";
-import { translateWithMlx } from "./mlxService.js";
 
 function getClientIdFromIp(ip = "") {
   return ip.replace(/^::ffff:/, "") || "unknown";
 }
 
-export default async function translateMultipleLangsOneRequest(
-  text,
-  targetLangs = [],
-  ip = "",
-  model = "qwen3-8b" 
-) {
+export default async function translateMultipleLangsOneRequest(text, targetLangs = [], ip = "", model) {
   if (!targetLangs || targetLangs.length === 0) {
     targetLangs = ["vi", "en", "zh-tw"];
   }
 
-  const clientId = ip.replace(/^::ffff:/, "") || "unknown";
+  const clientId = getClientIdFromIp(ip);
+  const systemPrompt = buildSystemPrompt(targetLangs);
 
   try {
-    const result = await translateWithMlx(text, targetLangs, model);
+    const raw = await translateWithQwen(text, systemPrompt, clientId, model);
+    const result = parseQwenResponse(raw);
 
     await Translation.create({
       original: text,
       detected: result.source_language,
       targetLang: targetLangs.join(","),
-      translatedText: JSON.stringify(result.translations),
-      ip: clientId,
-      model 
+      translatedText: JSON.stringify(result.translation),
+      ip,
+      model
     });
 
     logger.log("Saved translation", {
       original: text,
       detected: result.source_language,
       targetLang: targetLangs.join(","),
-      translatedText: JSON.stringify(result.translations),
-      ip: clientId,
+      translatedText: JSON.stringify(result.translation),
+      ip,
       model
     });
 
@@ -51,11 +50,9 @@ export default async function translateMultipleLangsOneRequest(
       detected: fallback.source_language,
       targetLang: targetLangs.join(","),
       translatedText: JSON.stringify(fallback.translation),
-      ip: clientId,
-      model
+      ip
     });
 
     return fallback;
   }
 }
-

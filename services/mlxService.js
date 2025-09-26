@@ -1,4 +1,3 @@
-// mlxService.js
 import axios from "axios";
 
 const MLX_API_URL =
