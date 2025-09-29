@@ -52,9 +52,6 @@ const router = express.Router();
  *                 source_language:
  *                   type: string
  *                   example: en
- *                 original_text:
- *                   type: string
- *                   example: Hello, how are you?
  *                 translation:
  *                   type: object
  *                   additionalProperties:

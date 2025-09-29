@@ -9,7 +9,7 @@ export default function parseQwenResponse(raw) {
     const jsonStr = raw.slice(startIndex, endIndex + 1);
     const parsed = JSON.parse(jsonStr);
 
-    const allowedKeys = ["source_language", "original_text", "translation"];
+    const allowedKeys = ["source_language", "translation"];
     const cleaned = Object.fromEntries(
       allowedKeys.map((key) => [key, parsed[key]]).filter(([_, v]) => v !== undefined)
     );
@@ -27,7 +27,6 @@ export default function parseQwenResponse(raw) {
 
     if (
       typeof cleaned.source_language !== "string" ||
-      typeof cleaned.original_text !== "string" ||
       typeof cleaned.translation !== "object"
     ) {
       throw new Error("Invalid structure after cleanup");
