@@ -18,7 +18,7 @@ const Translation = sequelize.define("Translation", {
     type: DataTypes.TEXT, 
     allowNull: false,
   },
-  ip: {
+  source: {
     type: DataTypes.STRING,
     allowNull: true,
   },

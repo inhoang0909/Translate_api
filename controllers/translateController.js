@@ -11,10 +11,8 @@ function withTimeout(promise, timeoutMs = 30000) {
 }
 
 export async function translateController(req, res) {
-  const { text, targetLangs, model } = req.body;
-  const rawIp =
-    req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  const ip = rawIp.replace(/^::ffff:/, "");
+  const { text, targetLangs, model, source } = req.body;
+
 
   const allowedModels = ["qwen3-8b", "gemma3-12b", "qwen3-32b"];
 
@@ -40,12 +38,12 @@ export async function translateController(req, res) {
     logger.log("Incoming translation request", {
       text,
       targetLangs,
-      ip,
+      source,
       model: selectedModel
     });
 
     const result = await withTimeout(
-      translateMultipleLangsOneRequest(text, targetLangs, ip, selectedModel),
+      translateMultipleLangsOneRequest(text, targetLangs, selectedModel, source),
       60000
     );
 

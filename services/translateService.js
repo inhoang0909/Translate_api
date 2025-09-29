@@ -5,20 +5,16 @@ import buildSystemPrompt from "../helpers/buildPrompt.js";
 import parseQwenResponse from "../helpers/parseResponse.js";
 import buildFallback from "../helpers/buildFallback.js";
 
-function getClientIdFromIp(ip = "") {
-  return ip.replace(/^::ffff:/, "") || "unknown";
-}
 
-export default async function translateMultipleLangsOneRequest(text, targetLangs = [], ip = "", model) {
+export default async function translateMultipleLangsOneRequest(text, targetLangs = [], model, source) {
   if (!targetLangs || targetLangs.length === 0) {
     targetLangs = ["vi", "en", "zh-tw"];
   }
 
-  const clientId = getClientIdFromIp(ip);
   const systemPrompt = buildSystemPrompt(targetLangs);
 
   try {
-    const raw = await translateWithQwen(text, systemPrompt, clientId, model);
+    const raw = await translateWithQwen(text, systemPrompt, model, source);
     const result = parseQwenResponse(raw);
 
     await Translation.create({
@@ -26,7 +22,7 @@ export default async function translateMultipleLangsOneRequest(text, targetLangs
       detected: result.source_language,
       targetLang: targetLangs.join(","),
       translatedText: JSON.stringify(result.translation),
-      ip,
+      source,
       model
     });
 
@@ -35,11 +31,19 @@ export default async function translateMultipleLangsOneRequest(text, targetLangs
       detected: result.source_language,
       targetLang: targetLangs.join(","),
       translatedText: JSON.stringify(result.translation),
-      ip,
+      source,
       model
     });
 
-    return result;
+    return {
+      success: true,
+      message: "Translation successful",
+      data: {
+        ...result,
+        model,
+        source
+      }
+    };
   } catch (err) {
     console.error("Translation failed:", err.message);
 
@@ -50,9 +54,18 @@ export default async function translateMultipleLangsOneRequest(text, targetLangs
       detected: fallback.source_language,
       targetLang: targetLangs.join(","),
       translatedText: JSON.stringify(fallback.translation),
-      ip
+      source,
+      model
     });
 
-    return fallback;
+    return {
+      success: false,
+      message: "Translation failed, fallback result returned",
+      data: {
+        ...fallback,
+        model,
+        source
+      },
+    };
   }
 }

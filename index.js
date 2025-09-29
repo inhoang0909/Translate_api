@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors());
 app.use(requestLoggerMiddleware);
 
-app.use("/", translateRoutes);
+app.use("/api", translateRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const PORT = process.env.PORT || 5600;
