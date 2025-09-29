@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://0.0.0.0:5600',
+        url: 'http://gmo021.cansportsvg.com/:49200',
       },
     ],
   },
