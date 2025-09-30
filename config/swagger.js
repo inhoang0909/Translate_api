@@ -1,4 +1,6 @@
 import swaggerJSDoc from 'swagger-jsdoc';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const options = {
   definition: {
@@ -10,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://gmo021.cansportsvg.com:49200',
+        url: process.env.SWAGGER_LOCAL_URL || 'http://0.0.0.0:5600',
       },
     ],
   },

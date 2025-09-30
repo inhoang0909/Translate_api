@@ -6,7 +6,8 @@ import swaggerSpec from "./config/swagger.js";
 import translateRoutes from "./routes/translateRoutes.js";
 import sequelize from "./config/db.js";
 import requestLoggerMiddleware from "./middleware/requestLoggerMiddleware.js";
-
+import categoryRoutes from "./routes/categoryRoutes.js";
+import vocabylaryRoutes from "./routes/vocabularyRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -15,6 +16,9 @@ app.use(cors());
 app.use(requestLoggerMiddleware);
 
 app.use("/", translateRoutes);
+app.use("/api", categoryRoutes);
+app.use("/api", vocabylaryRoutes);
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const PORT = process.env.PORT || 5600;
