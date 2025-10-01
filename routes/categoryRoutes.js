@@ -1,11 +1,11 @@
 import express from "express";
-import { createCategory, getCategoryList } from "../controllers/categoryController.js";
+import { createCategory, getCategoryList, updateCategory, deleteCategory } from "../controllers/categoryController.js";
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/category:
+ * /api/add-category:
  *   post:
  *     summary: Create a new category
  *     tags: [Category]
@@ -28,9 +28,10 @@ const router = express.Router();
  *         description: Internal server error
  */
 router.post("/add-category", createCategory);
+
 /**
  * @swagger
- * /api/category:
+ * /api/categories:
  *   get:
  *     summary: Get list of categories
  *     tags: [Category]
@@ -40,5 +41,64 @@ router.post("/add-category", createCategory);
  *       500:
  *         description: Internal server error
  */
-router.get("/category", getCategoryList);
+router.get("/categories", getCategoryList);
+
+/**
+ * @swagger
+ * /api/categories/{id}:
+ *   put:
+ *     summary: Update a category
+ *     tags: [Category]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Category ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: HR Updated
+ *     responses:
+ *       200:
+ *         description: Category updated successfully
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Category not found
+ *       500:
+ *         description: Internal server error
+ */
+router.put("/categories/:id", updateCategory);
+
+/**
+ * @swagger
+ * /api/categories/{id}:
+ *   delete:
+ *     summary: Delete a category
+ *     tags: [Category]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Category ID
+ *     responses:
+ *       200:
+ *         description: Category deleted successfully
+ *       404:
+ *         description: Category not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete("/categories/:id", deleteCategory);
+
 export default router;
