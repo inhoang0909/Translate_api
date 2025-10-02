@@ -180,3 +180,60 @@ export const deleteVocabulary = async (req, res) => {
     });
   }
 };
+
+export const getVocabularyById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const vocab = await Vocabulary.findOne({
+      where: { id },
+      attributes: ["id", "createdAt", "updatedAt"],
+      include: [
+        {
+          model: VocabularyTranslation,
+          attributes: ["language", "text", "description"],
+        },
+        {
+          model: Category,
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    if (!vocab) {
+      return res.status(404).json({
+        success: false,
+        message: "Vocabulary not found",
+        data: null,
+      });
+    }
+
+    const formatted = {
+      id: vocab.id,
+      translations: vocab.VocabularyTranslations.map(t => ({
+        lang: t.language,
+        text: t.text,
+        desc: t.description,
+      })),
+      categories: vocab.Categories.map(c => ({
+        id: c.id,
+        name: c.name,
+      })),
+      createdAt: vocab.createdAt,
+      updatedAt: vocab.updatedAt,
+    };
+
+    return res.json({
+      success: true,
+      message: "Vocabulary fetched successfully",
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("Error fetching vocabulary by id:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};

@@ -1,7 +1,43 @@
 import express from "express";
-import { addVocabulary, getVocabularyList, updateVocabulary, deleteVocabulary } from "../controllers/vocabularyController.js";
+import { addVocabulary, getVocabularyList, updateVocabulary, deleteVocabulary, getVocabularyById } from "../controllers/vocabularyController.js";
 
 const router = express.Router();
+/**
+ * @swagger
+ * /api/vocabularies:
+ *   get:
+ *     summary: Get list of vocabularies with their categories and translations
+ *     tags: [Vocabulary]
+ *     responses:
+ *       200:
+ *         description: Vocabulary list fetched successfully
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/vocabularies", getVocabularyList);
+
+/**
+ * @swagger
+ * /api/vocabulary/{id}:
+ *   get:
+ *     summary: Get a vocabulary by ID
+ *     tags: [Vocabulary]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Vocabulary ID
+ *     responses:
+ *       200:
+ *         description: Vocabulary fetched successfully
+ *       404:
+ *         description: Vocabulary not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/vocabulary/:id", getVocabularyById);
 
 /**
  * @swagger
@@ -45,19 +81,6 @@ const router = express.Router();
  */
 router.post("/add-vocabulary", addVocabulary);
 
-/**
- * @swagger
- * /api/vocabularies:
- *   get:
- *     summary: Get list of vocabularies with their categories and translations
- *     tags: [Vocabulary]
- *     responses:
- *       200:
- *         description: Vocabulary list fetched successfully
- *       500:
- *         description: Internal server error
- */
-router.get("/vocabularies", getVocabularyList);
 
 /**
  * @swagger
@@ -132,5 +155,6 @@ router.put("/update-vocabulary/:id", updateVocabulary);
  *         description: Internal server error
  */
 router.delete("/delete-vocabulary/:id", deleteVocabulary);
+
 
 export default router;

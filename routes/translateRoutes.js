@@ -29,13 +29,13 @@ const router = express.Router();
  *               text:
  *                 type: string
  *                 description: The input text to be translated.
- *                 example: Hello, how are you?
+ *                 example: Chào buổi sáng
  *               targetLangs:
  *                 type: array
  *                 description: Array of language codes to translate into.
  *                 items:
  *                   type: string
- *                 example: [ "vi", "zh-tw" ]
+ *                 example: [ "en", "zh-tw" ]
  *               model:
  *                 type: string
  *                 description: The model to use for translation (e.g., "qwen3-8b", "gemma3-12b", "qwen3-32b").
@@ -70,8 +70,8 @@ const router = express.Router();
  *                       additionalProperties:
  *                         type: string
  *                       example:
- *                         vi: "Xin chào, bạn khỏe không?"
- *                         zh-tw: "你好，你好嗎？"
+ *                         en: "Chào buổi sáng"
+ *                         zh-tw: "早安"
  *                     model:
  *                       type: string
  *                       example: qwen3-8b

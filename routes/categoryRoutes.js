@@ -2,6 +2,19 @@ import express from "express";
 import { createCategory, getCategoryList, updateCategory, deleteCategory } from "../controllers/categoryController.js";
 
 const router = express.Router();
+/**
+ * @swagger
+ * /api/categories:
+ *   get:
+ *     summary: Get list of categories
+ *     tags: [Category]
+ *     responses:
+ *       200:
+ *         description: Category list fetched successfully
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/categories", getCategoryList);
 
 /**
  * @swagger
@@ -29,19 +42,6 @@ const router = express.Router();
  */
 router.post("/add-category", createCategory);
 
-/**
- * @swagger
- * /api/categories:
- *   get:
- *     summary: Get list of categories
- *     tags: [Category]
- *     responses:
- *       200:
- *         description: Category list fetched successfully
- *       500:
- *         description: Internal server error
- */
-router.get("/categories", getCategoryList);
 
 /**
  * @swagger
