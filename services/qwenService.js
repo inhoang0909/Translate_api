@@ -16,8 +16,8 @@ const SPAM_THRESHOLD_MS = 28000;
 export async function translateWithQwen(
   prompt,
   systemPrompt,
-  clientId = "default",
-  model = OLLAMA_MODEL
+  model = OLLAMA_MODEL,
+  clientId = "default"
 ) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -25,7 +25,7 @@ export async function translateWithQwen(
   handleSpamRequest(clientId, controller, SPAM_THRESHOLD_MS);
 
   const body = {
-    model: OLLAMA_MODEL,
+    model: model, // Use the parameter, not OLLAMA_MODEL
     prompt,
     system: systemPrompt,
     stream: false,
@@ -35,19 +35,22 @@ export async function translateWithQwen(
     presence_penalty: 2.0,
     top_p: 0.7,
     repeat_last_n: 128,
+    temperature: 0,
   };
 
   const payload = {
     body,
-    model: OLLAMA_MODEL,
+    model: model, // Use the parameter, not OLLAMA_MODEL
     clientId,
     signal: controller.signal,
   };
-  console.log("[QwenService] Sending payload to API:", JSON.stringify(payload, null, 2));
+  
+  console.log("[QwenService] Full payload:", JSON.stringify(payload, null, 2));
 
   try {
-
     const result = await queueOrExecuteRequest(payload);
+    
+    console.log("[QwenService] Raw result:", result);
 
     clearTimeout(timeout);
     cleanupRequest(clientId, controller);
@@ -59,19 +62,30 @@ export async function translateWithQwen(
     let parsed;
     try {
       parsed = JSON.parse(result);
+      console.log("[QwenService] Parsed result:", parsed);
     } catch (err) {
+      console.error("[QwenService] JSON parse error:", err.message);
       throw new QwenResponseError("Malformed JSON from model", 500);
     }
 
     if (!parsed.translation) {
+      console.error("[QwenService] Missing translation field in:", parsed);
       throw new QwenResponseError("Missing translation field", 500);
     }
 
+    console.log("[QwenService] ===== TRANSLATION REQUEST SUCCESS =====");
     return result;
 
   } catch (err) {
     clearTimeout(timeout);
     cleanupRequest(clientId, controller);
+
+    console.error("[QwenService] ===== TRANSLATION REQUEST FAILED =====");
+    console.error("[QwenService] Error details:", {
+      name: err.name,
+      message: err.message,
+      stack: err.stack
+    });
 
     if (err.name === "AbortError") {
       console.warn(`[QwenService] Request from ${clientId} was aborted or timed out.`);

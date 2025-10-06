@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.use("/api", categoryRoutes);
 router.use("/api", vocabularyRoutes);
-router.use("/translate", translateRoutes);
+router.use("/", translateRoutes);
 
 export default router;

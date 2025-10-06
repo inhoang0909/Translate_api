@@ -14,6 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(requestLoggerMiddleware);
+app.set('trust proxy', true);
 
 app.use("/", routes )
 
