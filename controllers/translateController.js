@@ -15,7 +15,7 @@ function withTimeout(promise, timeoutMs = 30000) {
 export async function translateController(req, res) {
   const { text, targetLangs, model, source } = req.body;
 
-  const allowedModels = ["qwen3-8b", "qwen3-14b", "qwen3-32b"];
+  const allowedModels = ["qwen3-8b", "gemma3-12b", "qwen3-32b"];
 
   if (!text) {
     return res.status(400).json({
@@ -83,7 +83,7 @@ export async function translateController(req, res) {
 export async function translateRAGController(req, res) {
   const { text, targetLangs, model, source, categories } = req.body;
 
-  const allowedModels = ["qwen3-8b", "qwen3-14b", "qwen3-32b"];
+  const allowedModels = ["qwen3-8b", "gemma3-12b", "qwen3-32b"];
 
   if (!text) {
     return res.status(400).json({

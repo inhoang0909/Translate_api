@@ -6,7 +6,7 @@ const MAX_QUEUE_LENGTH = 18;
 const OLLAMA_API_URLS = [
   process.env.OLLAMA_API_URL_1 || "http://10.13.34.181:11434/api/generate",
   process.env.OLLAMA_API_URL_2 || "http://10.13.34.181:11435/api/generate",
-  // process.env.OLLAMA_API_URL_3 || "http://10.13.33.50:11434/api/generate"
+  process.env.OLLAMA_API_URL_3 || "http://10.13.33.50:11434/api/generate"
 ];
 
 const apiBusyStatus = OLLAMA_API_URLS.map(() => null);

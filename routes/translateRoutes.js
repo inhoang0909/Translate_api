@@ -40,7 +40,7 @@ const router = express.Router();
  *                 type: string
  *                 description: The model to use for translation.
  *                 example: qwen3-8b
- *                 enum: [ "qwen3-8b", "qwen3-14b", "qwen3-32b" ]
+ *                 enum: [ "qwen3-8b", "gemma3-12b", "qwen3-32b" ]
  *               source:
  *                 type: string
  *                 description: The source of the translation request.
@@ -92,7 +92,7 @@ router.post("/api/translate", translateController);
  *                 type: string
  *                 description: The model to use for translation.
  *                 example: qwen3-8b
- *                 enum: [ "qwen3-8b", "qwen3-14b", "qwen3-32b" ]
+ *                 enum: [ "qwen3-8b", "gemma3-12b", "qwen3-32b" ]
  *               source:
  *                 type: string
  *                 description: The source of the translation request.
